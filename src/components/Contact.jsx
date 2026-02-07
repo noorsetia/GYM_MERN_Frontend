@@ -1,4 +1,5 @@
 import axios from "axios";
+import apiClient from "../service/axios.config";
 import React, { useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -12,18 +13,18 @@ const Contact = () => {
   const sendMail = async (e) => {
     e.preventDefault();
     setLoading(true);
+    // client-side validation to avoid sending empty fields
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setLoading(false);
+      toast.error("Please fill in name, email and message before sending.");
+      return;
+    }
     try {
-      const { data } = await axios.post(
-        "http://localhost:4000/send/mail",
-        {
-          name,
-          email,
-          message,
-        },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
+      // Use the shared API client which already has the correct baseURL for production
+      const { data } = await apiClient.post(
+        "/send/mail",
+        { name, email, message },
+        { headers: { "Content-Type": "application/json" } }
       );
       setName("");
       setEmail("");
@@ -32,7 +33,10 @@ const Contact = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      toast.error(error.response.data.message);
+      // Network errors or CORS failures often don't include `response`.
+      const message =
+        error?.response?.data?.message || error?.message || "Something went wrong";
+      toast.error(message);
     }
   };
 
