@@ -1,7 +1,7 @@
 import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -14,7 +14,10 @@ import Footer from "./components/Footer";
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter
+      // Opt into React Router v7 future flags via the `future` prop for forward compatibility.
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
       <Navbar />
       <Hero />
       <WorkoutSessions />

@@ -1,5 +1,5 @@
 import axios from "axios";
-import apiClient from "../service/axios.config";
+import api from "../service/apiClient";
 import React, { useState } from "react";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -20,26 +20,25 @@ const Contact = () => {
       return;
     }
     try {
-      // Use the shared API client which already has the correct baseURL for production
-      const { data } = await apiClient.post(
-        "/send/mail",
-        { name, email, message },
-        { headers: { "Content-Type": "application/json" } }
-      );
+      // Use the centralized API wrapper which normalizes errors
+      const data = await api.post("/send/mail", { name, email, message });
       setName("");
       setEmail("");
       setMessage("");
-      toast.success(data.message);
+      toast.success(data.message || "Message Sent Successfully.");
       setLoading(false);
     } catch (error) {
       setLoading(false);
       // Network errors or CORS failures often don't include `response`.
-      if (!error || !error.response) {
-        // This is a network error (server unreachable, DNS, CORS preflight failed, etc.)
+      // Our apiClient throws a normalized Error. Distinguish network errors.
+      if (error && error.code === "NETWORK_ERROR") {
+        // In development, log the original error for debugging
+        if (process.env.NODE_ENV !== "production") console.error(error.original);
         toast.error("Network error: could not reach server. Please try again later.");
       } else {
-        const message = error.response?.data?.message || error.message || "Something went wrong";
-        toast.error(message);
+        // Non-network error — show safe message and log details in development
+        if (process.env.NODE_ENV !== "production") console.error(error);
+        toast.error(error?.message || "Something went wrong. Please try again.");
       }
     }
   };
