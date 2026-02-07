@@ -27,7 +27,7 @@ const App = () => {
       <BMICalculator />
       <Footer />
       <ToastContainer theme="dark" position="top-center" />
-    </Router>
+    </BrowserRouter>
   );
 };
 
