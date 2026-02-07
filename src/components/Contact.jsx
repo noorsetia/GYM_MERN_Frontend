@@ -34,9 +34,13 @@ const Contact = () => {
     } catch (error) {
       setLoading(false);
       // Network errors or CORS failures often don't include `response`.
-      const message =
-        error?.response?.data?.message || error?.message || "Something went wrong";
-      toast.error(message);
+      if (!error || !error.response) {
+        // This is a network error (server unreachable, DNS, CORS preflight failed, etc.)
+        toast.error("Network error: could not reach server. Please try again later.");
+      } else {
+        const message = error.response?.data?.message || error.message || "Something went wrong";
+        toast.error(message);
+      }
     }
   };
 
