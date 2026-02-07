@@ -9,6 +9,9 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Optional runtime env override: create /env.js on the server with
+         window.__API_BASE_URL__ = 'https://your-backend.example.com'; -->
+    <script src="/env.js"></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
