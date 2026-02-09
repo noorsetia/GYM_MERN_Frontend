@@ -29,16 +29,21 @@ const Contact = () => {
       setLoading(false);
     } catch (error) {
       setLoading(false);
-      // Network errors or CORS failures often don't include `response`.
-      // Our apiClient throws a normalized Error. Distinguish network errors.
+      // Log full error in development for debugging
+      if (process.env.NODE_ENV !== "production") {
+        console.error("Contact form error:", error);
+      }
+      
+      // Always show the actual error message from the backend
+      // This includes Gmail limit errors, validation errors, etc.
+      const errorMessage = error?.message || "Something went wrong. Please try again.";
+      
+      // For true network failures (server unreachable), show helpful message
       if (error && error.code === "NETWORK_ERROR") {
-        // In development, log the original error for debugging
-        if (process.env.NODE_ENV !== "production") console.error(error.original);
-        toast.error("Network error: could not reach server. Please try again later.");
+        toast.error(`Network error: ${errorMessage}. Please check if the server is running.`);
       } else {
-        // Non-network error — show safe message and log details in development
-        if (process.env.NODE_ENV !== "production") console.error(error);
-        toast.error(error?.message || "Something went wrong. Please try again.");
+        // Backend responded with an error - show the actual message
+        toast.error(errorMessage);
       }
     }
   };
